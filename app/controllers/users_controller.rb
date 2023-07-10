@@ -1,36 +1,54 @@
 class UsersController < ApplicationController
-		# include JsonWebToken
 
+	before_action :user, only: [:destroy]
 	skip_before_action :authenticate_request, only: [:create, :login]
-	# before_action :set_user, only: [:show, :destroy]
 
 	def index
-		# @users = User.all
-		# render json: @users, status: :ok
+		@user = User.paginate(page: params[:page], per_page: 10)
+		render json: @user
 	end
 
 	def show
-		# render json: @user, status: :ok
+		if @current_user.user_type == 'owner' || @current_user.user_type == 'OWNER' 
+			@user_type = params[:user_type]
+			if @user_type == 'owner' || @user_type == 'OWNER'
+				@owners = User.where(user_type: ['OWNER', 'owner'])
+				render json: @owners
+			elsif @user_type == 'customer' || @user_type == 'CUSTOMER'
+				@customers = User.where(user_type: ['CUSTOMER', 'customer'])
+				render json: @customers
+			else
+				render json: { error: 'Invalid user_type parameter' }, status: :unprocessable_entity
+			end
+		else
+			render json: {message: "you are not owner"}
+		end
+
 	end
 
 	def create
-		# byebug
 		@user =  User.new(user_params)
 		if @user.save
 			render json: @user, status: :created
 		else
-			render json: { errors: @user.errors.full_messages },
-			status: :unproccessable_entity
+			render json: { error: @user.errors.full_messages }, status: :unprocessable_entity
 		end
 	end
 
-	# def update
-	# 	@user = User.find(params[:id])
-	# 	unless @user.update(user_params)
-	# 		render json: { errors: @user.errors.full_messages},
-	# 		status: :unproccessable_entity
-	# 	end 
-	# end
+	def destroy
+		if @current_user.user_type == 'owner' || @current_user.user_type == 'OWNER' 
+			if @user
+				@user.destroy
+				render json: { message: 'user deleted successfully' }
+			else
+				render json: { message: 'user not found' }
+			end
+		else
+			render json: {message: "you are not owner"}
+		end
+
+	end
+
 
 	def login
 		@user = User.find_by(email: params[:email], password: params[:password])
@@ -38,27 +56,27 @@ class UsersController < ApplicationController
 			token = jwt_encode(user_id: @user.id)
 			render json: { token: token }, status: :ok
 		else
-			render json: { errors: "Unauthorized"}, staus: 	:unauthorized
+			render json: { errors: "Invalid email password"}, staus: 	:unauthorized
 		end
 	end
 
-	# def destroy
-	# 	@user.destroy
-	# end
-
 	def search_dishes
-		@dish = Restaurant.find_by(id: @current_user)
-		@dish = @dish.dishes
-		render json: @dish
+		if @current_user.user_type == 'customer' || @current_user.user_type == 'CUSTOMER' 
+			@dish = Restaurant.find_by(id: @current_user)
+			@dish = @dish.dishes
+			render json: @dish
+		else
+			render json: {message: "you are not customer"}
+		end
 	end
 
 	private
-		def user_params
-			params.permit(:name, :email, :password, :user_type)
 
-		end
+	def user_params
+		params.permit(:user_type, :name, :email, :password)
+	end
 
-# 		def set_user
-# 			@user = User.find(params[:id])
-# 		end
+	def user
+		@user = User.find_by(name: params[:name])
+	end
 end

@@ -10,7 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_07_083806) do
+ActiveRecord::Schema[7.0].define(version: 2023_07_10_094943) do
+  create_table "carts", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_carts_on_user_id"
+  end
+
   create_table "categories", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -25,6 +32,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_07_083806) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "restaurant_id", null: false
+    t.integer "cart_id"
+    t.index ["cart_id"], name: "index_dishes_on_cart_id"
     t.index ["category_id"], name: "index_dishes_on_category_id"
     t.index ["restaurant_id"], name: "index_dishes_on_restaurant_id"
     t.index ["user_id"], name: "index_dishes_on_user_id"
@@ -32,11 +41,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_07_083806) do
 
   create_table "restaurants", force: :cascade do |t|
     t.string "name"
-    t.time "open_time"
-    t.time "close_time"
     t.integer "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "status"
     t.index ["user_id"], name: "index_restaurants_on_user_id"
   end
 
@@ -49,6 +57,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_07_083806) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "carts", "users"
   add_foreign_key "dishes", "categories"
   add_foreign_key "dishes", "restaurants"
   add_foreign_key "dishes", "users"

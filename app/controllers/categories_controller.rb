@@ -1,16 +1,15 @@
 class CategoriesController < ApplicationController
 
 	def index
-		@category = Category.all
+		# @category = Category.all
+		@category = Category.paginate(page: params[:page], per_page: 4)
 		render json: @category
 	end
 
 	def show
-   category = Category.find_by("name LIKE ? ", "%#{params[:name]}") 
-  	 
-  	dishes = category.dishes
+		category = Category.find_by(name: params[:name]) 
+		dishes = category.dishes
+		render json: dishes  	    
+		send
 
-  	  render json: dishes  	    
-  end
- 
-end
+	end

@@ -156,6 +156,7 @@ GEM
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
+    will_paginate (4.0.0)
     zeitwerk (2.6.8)
 
 PLATFORMS
@@ -171,9 +172,10 @@ DEPENDENCIES
   rails (~> 7.0.6)
   sqlite3 (~> 1.4)
   tzinfo-data
+  will_paginate
 
 RUBY VERSION
    ruby 3.0.0p0
 
 BUNDLED WITH
-   2.2.3
+   2.4.15
