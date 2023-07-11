@@ -33,37 +33,42 @@ class RestaurantsController < ApplicationController
   		end
   	end
 
-	# def show
-		# if @current_user.user_type == 'CUSTOMER' || @current_user.user_type == 'customer' 
-	# 	@restaurant = Restaurant.find_by(name: params[:name])
-	# 	render json: @restaurant
-		# else
-  		# 	render json: {message: "you are not owner"}
-  		# end
-	# end
+	def show
+		if @current_user.user_type == 'CUSTOMER' || @current_user.user_type == 'customer' 
+		@restaurant = Restaurant.find_by(name: params[:name])
+		render json: @restaurant
+		else
+  			render json: {message: "you are not owner"}
+  		end
+	end
 
-	# def check_dishes_by_category
+	def check_dishes_by_category
 
-	# 	restaurant = Restaurant.find_by(name: params[:id])
-	# 	category = params[:category]
-	# 	dishes = restaurant.dishes.where(category: category)
+		restaurant = Restaurant.find_by(name: params[:name])
+		category = params[:category]
+		dishes = restaurant.dishes.where(category: category)
 
-	# 	render json: dishes
-	#   rescue ActiveRecord::RecordNotFound
-	# 	render json: { error: 'Restaurant not found' }, status: :not_found
-	#   end
+		render json: dishes
+	  rescue ActiveRecord::RecordNotFound
+		render json: { error: 'Restaurant not found' }, status: :not_found
+	  end
 
 	def update
 		begin
-			@restaurant = Restaurant.find(params[:id])
-		 	if @current_user.user_type == 'owner' || @current_user.user_type == 'OWNER' 
-				if @restaurant.update(restaurant_params)
-					render json: @restaurant
+			restaurant = @current_user.restaurants.find_by(id: params[:id])
+			if restaurant
+				@restaurant = Restaurant.find(params[:id])
+				if @current_user.user_type == 'owner' || @current_user.user_type == 'OWNER' 
+					if @restaurant.update(restaurant_params)
+						render json: @restaurant
+					else
+						render json: { error: @restaurant.errors.full_messages }, status: :unprocessable_entity
+					end
 				else
-					render json: { error: @restaurant.errors.full_messages }, status: :unprocessable_entity
+					render json: {message: "you are not owner"}
 				end
-			else
-				render json: {message: "you are not owner"}
+			else 
+				render json: {message: "restaurant id not your"}
 			end
 		rescue
 			render json: {message: "No data found with this id"}

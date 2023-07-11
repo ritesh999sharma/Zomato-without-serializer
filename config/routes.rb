@@ -12,13 +12,13 @@ Rails.application.routes.draw do
   post '/restaurant/create', to: 'restaurants#create'
   get 'restaurant/:name', to: 'restaurants#check_dishes'  
   delete 'restaurant/:name', to: 'restaurants#destroy'
-  patch 'restaurant/:id', to: 'restaurants#update'
+  patch 'restaurant/:id', to: 'restaurants#update'  
 
   post 'dish/create', to: 'dishes#create'
   get '/dish/:name', to: 'dishes#show'
   get 'dish', to: 'dishes#index'
   delete '/dish/:name', to: 'dishes#destroy'
-  patch '/dishes/:id', to: 'dishes#update'
+  patch '/dish/:id', to: 'dishes#update'
 
 
   get '/category', to: 'categories#index'

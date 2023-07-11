@@ -8,4 +8,4 @@
 Category.create(name:'Starter')
 Category.create(name:'Deserts')
 Category.create(name:'Drinks')
-Category.create(name:'Main Course')
+Category.create(name:'MainCourse')

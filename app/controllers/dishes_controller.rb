@@ -9,9 +9,10 @@ class DishesController < ApplicationController
 
   def create
     if @current_user.user_type == 'owner' || @current_user.user_type == 'OWNER' 
+      # byebug
       @dish = Dish.new(dish_params)
       if @dish.save
-        render json: @dish, {message: "dish created"}
+        render json: @dish
       else
         render json: {message: "dish not created"}
       end
@@ -26,13 +27,17 @@ class DishesController < ApplicationController
   end
 
   def update
-    if @current_user.user_type == 'owner' || @current_user.user_type == 'OWNER' 
-      @dish = Dish.find_by(name: params[:name])
+    if @current_user.user_type == 'owner' || @current_user.user_type == 'OWNER'
+      begin
+      @dish = Dish.find_by(id: params[:id])
       if @dish.update(dish_params)
         render json: @dish
       else
         render json: { error: @dish.errors.full_messages }, status: :unprocessable_entity
       end
+    rescue
+       render json: {message: "id not found"}
+     end
     else
       render json: {message: "you are not owner"}
     end
